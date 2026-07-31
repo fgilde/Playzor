@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="build/Playzor.props" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/playzor_publish.yml" />
+  </Folder>
+  <Project Path="Playzor.Blazor/Playzor.Blazor.csproj" />
+  <Project Path="Playzor.Blazor.Editor/Playzor.Blazor.Editor.csproj" />
+  <Project Path="Playzor.Core/Playzor.Core.csproj" />
+  <Project Path="Playzor.Server/Playzor.Server.csproj" />
+  <Project Path="Playzor.Tests/Playzor.Tests.csproj" />
+  <Project Path="Playzor.UserComponents/Playzor.UserComponents.csproj" />
+</Solution>

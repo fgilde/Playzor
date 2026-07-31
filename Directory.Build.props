@@ -1,0 +1,20 @@
+<!--
+  MudBlazor.Extensions is a dependency of Playzor.Core and Playzor.Blazor.Editor, and it lives in
+  its own repository. Referencing it as a package is right for anyone building Playzor on its own,
+  but it makes a change that spans both repositories a three step dance: release MudEx, bump here,
+  build.
+
+  So the reference follows the working copy: when the MudBlazor.Extensions repository sits next to
+  this one, the projects compile against its source, otherwise against the published package.
+  A build server only ever checks out this repository and therefore always takes the package.
+  Force either side with -p:UseMudExSource=true|false.
+-->
+<Project>
+
+  <PropertyGroup>
+    <MudExProject>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\MudBlazor.Extensions\MudBlazor.Extensions\MudBlazor.Extensions.csproj'))</MudExProject>
+    <UseMudExSource Condition="'$(UseMudExSource)' == '' And Exists('$(MudExProject)')">true</UseMudExSource>
+    <UseMudExSource Condition="'$(UseMudExSource)' == ''">false</UseMudExSource>
+  </PropertyGroup>
+
+</Project>
