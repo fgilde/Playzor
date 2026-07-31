@@ -165,6 +165,7 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
     // one monaco editor + model per id (dock panel); model per file keeps undo/scroll state
     const _editors = new Map();
     const _pending = new Map(); // value set before async create completed
+    const _createOptions = new Map(); // what create was called with, so ensure can repeat it
 
     function _get(id) { return _editors.get(id); }
 
@@ -190,6 +191,19 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
             _editors.delete(id);
         }
         _pending.delete(id);
+    }
+
+    /**
+     * True while the editor still sits in the element it was created in. Moving a panel between
+     * windows or rebuilding the layout can leave monaco pointing at dom that is gone, and since
+     * blazor only calls create on the first render nothing would ever bring it back.
+     */
+    function _isHealthy(id) {
+        const editor = _editors.get(id);
+        const host = pzById(id);
+        if (!editor || !host) { return false; }
+        const dom = editor.getDomNode?.();
+        return !!dom && dom.isConnected && host.contains(dom);
     }
 
     return {
@@ -221,9 +235,18 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
                 });
                 _pending.delete(id);
                 _editors.set(id, editor);
+                _createOptions.set(id, { language: language || 'razor', readOnly: readOnly, theme: theme });
 
                 _registerGlobalsOnce();
             })
+        },
+        /** Rebuilds an editor whose dom did not survive a move, keeping its text. */
+        ensure: function (id) {
+            if (!id || _isHealthy(id)) { return; }
+            const editor = _editors.get(id);
+            const options = _createOptions.get(id);
+            if (!editor || !options) { return; } // never created — the create call is still on its way
+            window.Playzor.Editor.create(id, editor.getValue(), options.language, options.readOnly, options.theme);
         },
         getValue: function (id) {
             return _get(id)?.getValue() ?? _pending.get(id) ?? '';
@@ -432,10 +455,26 @@ window.Playzor.Console = window.Playzor.Console || (function () {
 
 window.Playzor.CodeExecution = window.Playzor.CodeExecution || (function () {
     const UNEXPECTED_ERROR_MESSAGE = 'An unexpected error has occurred. Please try again later or contact the team.';
+    const STORAGE_KEY = 'try-usercomponents-dll';
 
     // Hier halten wir die aktuellen UserComponents in Memory
     let _userComponentsDllBytes = null;
     let _userComponentsDllBase64 = null;
+
+    /**
+     * The preview iframe is a second wasm instance and picks the freshly compiled assembly up from
+     * session storage. A popout window gets a copy of that storage when it opens and goes its own
+     * way afterwards — so a preview living over there would keep booting the assembly of the run
+     * before it was popped out. Every window gets its own copy.
+     */
+    function persistToEveryWindow(base64) {
+        if (!base64) return;
+        const documents = window.MudExPopoutEvents?.documents() ?? [document];
+        for (const doc of documents) {
+            try { doc.defaultView.sessionStorage.setItem(STORAGE_KEY, base64); }
+            catch (e) { console.warn('Failed to persist user components dll', e); }
+        }
+    }
 
     function convertBase64StringToBytes(base64String) {
         const binaryString = window.atob(base64String);
@@ -494,13 +533,7 @@ window.Playzor.CodeExecution = window.Playzor.CodeExecution || (function () {
             _userComponentsDllBytes = dllBytes;
             _userComponentsDllBase64 = base64String;
 
-            try {
-                if (base64String) {
-                    sessionStorage.setItem('try-usercomponents-dll', base64String);
-                }
-            } catch (e) {
-                console.warn('Failed to persist user components dll to sessionStorage', e);
-            }
+            persistToEveryWindow(base64String);
         },
 
         // Wird vom Bootloader (loadBootResource) verwendet
@@ -510,7 +543,7 @@ window.Playzor.CodeExecution = window.Playzor.CodeExecution || (function () {
             }
 
             try {
-                const base64 = _userComponentsDllBase64 || sessionStorage.getItem('try-usercomponents-dll');
+                const base64 = _userComponentsDllBase64 || sessionStorage.getItem(STORAGE_KEY);
                 if (base64) {
                     _userComponentsDllBase64 = base64;
                     _userComponentsDllBytes = convertBase64StringToBytes(base64);

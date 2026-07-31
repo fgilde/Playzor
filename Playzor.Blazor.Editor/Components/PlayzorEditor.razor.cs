@@ -1140,12 +1140,28 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
         }
     }
 
-    private Task HandlePanelMovedAsync(DockviewMovePanelEvent _) => PersistLayoutAsync();
+    private async Task HandlePanelMovedAsync(DockviewMovePanelEvent e)
+    {
+        EnsureEditorAlive(e?.PanelId);
+        await PersistLayoutAsync();
+    }
 
     private void HandleActivePanelChanged(string panelId)
     {
         if (panelId?.StartsWith("ed:") == true && CodeFiles.TryGetValue(panelId[3..], out var file))
             _activeCodeFile = file;
+        EnsureEditorAlive(panelId);
+    }
+
+    /// <summary>
+    /// Monaco is created on the first render of a <see cref="CodeEditor"/> and never again, so an
+    /// editor whose dom did not survive a move between panels or windows would stay empty for good.
+    /// </summary>
+    private void EnsureEditorAlive(string panelId)
+    {
+        if (panelId?.StartsWith("ed:") != true) return;
+        try { JsRuntime.InvokeVoid(PlayzorJs.Editor.Ensure, EditorDomId(panelId[3..])); }
+        catch { /* the script may not be up yet, the first render creates the editor anyway */ }
     }
 
     #endregion

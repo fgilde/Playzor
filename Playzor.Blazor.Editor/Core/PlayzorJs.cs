@@ -30,6 +30,9 @@ public static class PlayzorJs
         /// <summary>Creates a monaco instance for a dom id.</summary>
         public const string Create = "Playzor.Editor.create";
 
+        /// <summary>Rebuilds an instance whose dom did not survive a move between panels or windows.</summary>
+        public const string Ensure = "Playzor.Editor.ensure";
+
         /// <summary>Current text of one instance.</summary>
         public const string GetValue = "Playzor.Editor.getValue";
 
