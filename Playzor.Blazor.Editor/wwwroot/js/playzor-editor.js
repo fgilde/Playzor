@@ -206,6 +206,20 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
         return !!dom && dom.isConnected && host.contains(dom);
     }
 
+    /**
+     * Monaco measures its container when it is created. Created inside a panel that was hidden at
+     * the time it stays at that size — a few pixels in a corner — because the container growing
+     * later is not something it always notices.
+     */
+    function _isMissized(id) {
+        const editor = _editors.get(id);
+        const host = pzById(id);
+        const dom = editor?.getDomNode?.();
+        if (!dom || !host) { return false; }
+        const available = host.getBoundingClientRect();
+        return available.width > 0 && Math.abs(available.width - dom.getBoundingClientRect().width) > 2;
+    }
+
     return {
         create: function (id, value, language, readOnly, theme) {
             if (!id) { return; }
@@ -240,12 +254,19 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
                 _registerGlobalsOnce();
             })
         },
-        /** Rebuilds an editor whose dom did not survive a move, keeping its text. */
+        /** Puts an editor right that a panel move or a hidden panel left behind. */
         ensure: function (id) {
-            if (!id || _isHealthy(id)) { return; }
+            if (!id) { return; }
             const editor = _editors.get(id);
+            if (!editor) { return; } // never created — the create call is still on its way
+
+            if (_isHealthy(id)) {
+                if (_isMissized(id)) { try { editor.layout(); } catch (e) { } }
+                return;
+            }
+
             const options = _createOptions.get(id);
-            if (!editor || !options) { return; } // never created — the create call is still on its way
+            if (!options) { return; }
             window.Playzor.Editor.create(id, editor.getValue(), options.language, options.readOnly, options.theme);
         },
         getValue: function (id) {
