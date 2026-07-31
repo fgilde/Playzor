@@ -28,7 +28,14 @@ builder.Services.AddPlayzor();   // pass a MudEx configuration to let it add Mud
 <link href="_content/Playzor.Blazor.Editor/css/playzor-editor.css" rel="stylesheet" />
 <script src="_content/Playzor.Blazor.Editor/lib/monaco-editor/min/vs/loader.js"></script>
 <script src="_content/Playzor.Blazor.Editor/js/playzor-editor.js"></script>
+
+<!-- only needed for popped out panels, and it has to run BEFORE blazor starts -->
+<script src="_content/MudBlazor.Extensions/js/mudExPopoutEvents.js"></script>
 ```
+
+Panels can be dragged into their own browser window. Blazor delivers dom events through the document
+of the page it started in, so a panel over there would be dead without that last script: it records
+the listeners and replays them into the popout window.
 
 Two more things are needed, and the editor tells you when one is missing:
 
@@ -58,7 +65,8 @@ Two more things are needed, and the editor tells you when one is missing:
 | Parameter | Default | Description |
 |---|---|---|
 | `ToolButtons` | `All` | Flags: `Run`, `Save`, `Embed`, `Download`, `Upload`, `Samples`, `Packages`, `Panels`, `Layout`, `Theme`, plus `Standalone` and `None` |
-| `Panels` | `All` | Flags: `Files`, `Preview`, `Errors`, `Console` |
+| `Panels` | `All` | Flags: `Files`, `Preview`, `Errors`, `Console`, `Packages` |
+| `PackagesInDialog` | `false` | Nuget buttons open the dialog instead of the packages panel |
 | `ShowStatusBar` | `true` | Error counts, packages, preview reload |
 | `ToolBarStartContent` | – | Before the first built in button |
 | `ToolBarContent` | – | Between the built in buttons and the spacer |
