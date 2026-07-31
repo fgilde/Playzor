@@ -42,11 +42,7 @@ github/
 
 `-p:UseMudExSource=true|false` overrides the choice.
 
-## Releasing
-
-Tag `playzor-v1.2.3`, or run the *Publish Playzor Packages* workflow with a version. All five
-packages share one version, taken from the tag; `build/Playzor.props` holds the rest of the
-metadata. Pushing uses NuGet trusted publishing, so there is no api key anywhere in this repository.
+All five packages share one version.
 
 ## License
 
