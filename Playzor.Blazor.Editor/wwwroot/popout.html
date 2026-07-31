@@ -22,6 +22,14 @@
             height: 100%;
         }
     </style>
+    <script>
+        // The preview iframe talks to the editor by posting to its parent. Moved in here that
+        // parent is this window, and the editor listens in the opener — so pass it along.
+        window.addEventListener('message', function (e) {
+            if (!e.data || !e.data.__playzor || !window.opener || e.source === window.opener) return;
+            try { window.opener.postMessage(e.data, location.origin); } catch (err) { /* opener gone */ }
+        });
+    </script>
 </head>
 <body></body>
 </html>

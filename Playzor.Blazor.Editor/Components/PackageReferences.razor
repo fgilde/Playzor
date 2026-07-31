@@ -3,6 +3,10 @@
 @using MudBlazor.Extensions.Core
 @using Playzor.Core
 
+@* the grid has to be the element that scrolls: loading more hangs on its scroll event, and a host
+   that lets the grid grow would scroll around it instead — see GridStyle *@
+<div class="@RootClassStr()">
+
 <MudTextField Adornment="Adornment.End"
 @bind-Value="_search"
               OnKeyDown="@SearchKeyDown"
@@ -11,7 +15,7 @@
               AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Warning" Class="mr-10 ml-10 mb-10" T="string" Placeholder="Search for packages to use..." Variant="Variant.Outlined"></MudTextField>
 
 
-<MudGrid Class="package-result-grid" id="package-result-grid" @onscroll="@OnGridScroll" Style="@($"max-height: {MaxHeight}; overflow-y: auto; overflow-x:hidden")" Spacing="3" Justify="Justify.Center">
+<MudGrid Class="package-result-grid" id="package-result-grid" @onscroll="@OnGridScroll" Style="@GridStyle()" Spacing="3" Justify="Justify.Center">
     @if (_loading && !_isLoadingMore)
     {
         <MudProgressCircular Class="mt-5" Indeterminate="true" Size="Size.Large" Color="Color.Info" />
@@ -49,7 +53,9 @@
     </MudGrid>
 }
 
-@code {    
+</div>
+
+@code {
     RenderFragment RenderItem(NugetPackage package)
     {
         return @<MudItem xs="3" Style="@(IsVirtualized ? "margin:10px;" : "")">

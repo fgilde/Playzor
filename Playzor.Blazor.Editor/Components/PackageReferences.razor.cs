@@ -30,9 +30,28 @@ public partial class PackageReferences
     [Parameter]
     public EventCallback<NugetPackage[]> SelectedPackagesChanged { get; set; }
 
-    /// <summary>Height limit of the result grid. "none" lets it fill a dock panel.</summary>
+    /// <summary>Height limit of the result grid. "none" lets it fill its host instead.</summary>
     [Parameter]
     public string MaxHeight { get; set; } = "600px";
+
+    /// <summary>Without a height limit the component takes the host's height and the grid the rest.</summary>
+    private bool FillsHost => string.IsNullOrEmpty(MaxHeight) || MaxHeight == "none";
+
+    private string RootClassStr() => MudExCssBuilder.Default
+        .AddClass("d-flex flex-column mud-height-full", FillsHost)
+        .ToString();
+
+    // the grid stays the element that scrolls either way — loading more hangs on its scroll event,
+    // and a host that lets the grid grow would scroll around it instead
+    private string GridStyle() => MudExStyleBuilder.Default
+        .WithMaxHeight(MaxHeight, !FillsHost)
+        .WithFlex("1 1 auto", FillsHost)
+        // a flex child does not shrink below its content on its own; the floor keeps the grid
+        // usable in a short panel, which then scrolls around it
+        .WithMinHeight("220px", FillsHost)
+        .WithOverflowY(MudBlazor.Extensions.Core.Css.Overflow.Auto)
+        .WithOverflowX(MudBlazor.Extensions.Core.Css.Overflow.Hidden)
+        .Build();
 
     public NugetPackage[] SelectedPackages => _installed?.ToArray() ?? InstalledPackages ?? Array.Empty<NugetPackage>();
 

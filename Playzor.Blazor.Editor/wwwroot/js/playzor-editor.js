@@ -12,12 +12,28 @@ let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
 
+// a panel that was popped out lives in another document, where document.getElementById finds
+// nothing. MudExPopoutEvents knows those windows; without it (no popout) this is just document.
+function pzById(id) {
+    return window.MudExPopoutEvents?.byId(id) ?? document.getElementById(id);
+}
+
+function pzQuery(selector) {
+    return window.MudExPopoutEvents?.query(selector) ?? document.querySelector(selector);
+}
+
+function pzQueryAll(selector) {
+    return window.MudExPopoutEvents?.queryAll(selector) ?? [...document.querySelectorAll(selector)];
+}
+
 function isScrollAtBottom(containerOrId) {
     if (typeof containerOrId === 'string' || containerOrId instanceof String) {
-        containerOrId = document.querySelector(containerOrId);
+        containerOrId = pzQuery(containerOrId);
     }
+    if (!containerOrId) { return false; }
 
-    return containerOrId.scrollHeight - containerOrId.scrollTop === containerOrId.clientHeight;
+    // a fraction of a pixel is normal at other zoom levels, an exact hit is not
+    return containerOrId.scrollHeight - containerOrId.scrollTop - containerOrId.clientHeight <= 2;
 }
 
 function registerLangugageProvider(language) {
@@ -105,7 +121,7 @@ Object.assign(window.Playzor, {
         window.history.pushState(null, null, url);
     },
     reloadIframe: function (id, newSrc) {
-        const iFrame = document.getElementById(id);
+        const iFrame = pzById(id);
         if (!iFrame) { return; }
 
         // Standard-URL, wenn keine übergeben wurde
@@ -181,7 +197,7 @@ window.Playzor.Editor = window.Playzor.Editor || (function () {
             if (!id) { return; }
 
             require(['vs/editor/editor.main'], () => {
-                const host = document.getElementById(id);
+                const host = pzById(id);
                 if (!host) { return; } // panel was closed before monaco finished loading
 
                 // read before dispose: a setValue that arrived while monaco was still
@@ -327,7 +343,7 @@ window.Playzor.Preview = window.Playzor.Preview || (function () {
         // repl -> preview: the iframe reads dark/light from its url on load, so a live
         // toggle has to be pushed in
         pushTheme: function (isDark) {
-            document.querySelectorAll('iframe.playzor-preview-frame').forEach(function (frame) {
+            pzQueryAll('iframe.playzor-preview-frame').forEach(function (frame) {
                 try { frame.contentWindow.postMessage({ __playzor: 'theme', dark: !!isDark }, window.location.origin); } catch (e) { }
             });
         },
@@ -403,12 +419,12 @@ window.Playzor.Console = window.Playzor.Console || (function () {
             if (_flushTimer) { clearTimeout(_flushTimer); _flushTimer = null; }
         },
         isScrollAtBottom: function (selector, threshold) {
-            const el = document.querySelector(selector);
+            const el = pzQuery(selector);
             if (!el) { return true; }
             return el.scrollHeight - el.scrollTop - el.clientHeight <= (threshold || 40);
         },
         scrollToBottom: function (selector) {
-            const el = document.querySelector(selector);
+            const el = pzQuery(selector);
             if (el) { el.scrollTop = el.scrollHeight; }
         }
     };
