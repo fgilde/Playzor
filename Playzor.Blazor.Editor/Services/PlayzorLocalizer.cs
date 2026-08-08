@@ -237,6 +237,52 @@ public class PlayzorLocalizer : IStringLocalizer
                 "Ein iframe oder eine Komponente in einer Blazor-App. Leser bearbeiten den Code und führen ihn aus, ohne deine Seite zu verlassen.",
             ["Read the embedding guide"] = "Zur Einbettungs-Anleitung",
             ["Playzor is built with MudBlazor.Extensions"] = "Playzor ist mit MudBlazor.Extensions gebaut",
+            ["This playground runs on Playzor"] = "Dieser Playground läuft mit Playzor",
+            ["Or host the whole editor yourself"] = "Oder den ganzen Editor selbst betreiben",
+            ["This page is one Blazor component. Install the package and your app has the playground — with the panels, the tool bar and the buttons you pick."] =
+                "Diese Seite ist eine Blazor-Komponente. Paket installieren, und deine App hat den Playground — mit den Panels, der Toolbar und den Buttons, die du auswählst.",
+            ["Read the editor guide"] = "Zur Editor-Anleitung",
+
+            // editor guide
+            ["The editor"] = "Der Editor",
+            ["The editor in your own app"] = "Der Editor in deiner eigenen App",
+            ["This page you are on is one Blazor component. Install the package and your app has the whole playground: monaco editors for any number of files, roslyn compiling in the browser, dockable panels and a tool bar you decide about."] =
+                "Die Seite, auf der du gerade bist, ist eine Blazor-Komponente. Paket installieren, und deine App hat den ganzen Playground: Monaco-Editoren für beliebig viele Dateien, Roslyn kompiliert im Browser, andockbare Panels und eine Toolbar, über die du bestimmst.",
+            ["Install"] = "Installieren",
+            ["The package brings monaco and every script and stylesheet it needs — nothing has to be downloaded separately."] =
+                "Das Paket bringt Monaco und jedes Script und Stylesheet mit, das es braucht — es muss nichts separat geladen werden.",
+            ["Register and render"] = "Registrieren und rendern",
+            ["AddPlayzor also adds MudBlazor and MudBlazor.Extensions when your app has not done that already."] =
+                "AddPlayzor fügt auch MudBlazor und MudBlazor.Extensions hinzu, falls deine App das nicht schon getan hat.",
+            ["Scripts and styles"] = "Scripts und Styles",
+            ["The last one is only needed if you want panels in their own browser window. Blazor delivers events through the document of the page it started in, so a panel over there would not react to anything without it — and it has to run before blazor starts."] =
+                "Das letzte brauchst du nur, wenn Panels in einem eigenen Browserfenster liegen sollen. Blazor liefert Events über das Dokument der Seite aus, in der es gestartet ist — ein Panel dort drüben würde also auf nichts reagieren. Und es muss vor Blazor laufen.",
+            ["Two things the editor cannot do alone"] = "Zwei Dinge, die der Editor nicht allein kann",
+            ["It says so itself when one of them is missing."] = "Fehlt eines davon, sagt er das selbst.",
+            ["A package proxy"] = "Ein Paket-Proxy",
+            ["nuget.org answers without CORS headers, so a browser cannot fetch a package by itself. Either host the small server half yourself"] =
+                "nuget.org antwortet ohne CORS-Header, ein Browser kann ein Paket also nicht selbst holen. Entweder du betreibst die kleine Serverhälfte selbst",
+            ["or point the editor at this instance, which is open for it:"] =
+                "oder du zeigst mit dem Editor auf diese Instanz hier, die dafür offen ist:",
+            ["A preview page"] = "Eine Vorschau-Seite",
+            ["The compiled component runs in a second WebAssembly instance, so a snippet can never take your app down with it. Reference the stub assembly it replaces and let blazor boot the compiled bytes instead:"] =
+                "Die kompilierte Komponente läuft in einer zweiten WebAssembly-Instanz, damit ein Snippet deine App nie mitreißen kann. Referenziere die Stub-Assembly, die es ersetzt, und lass Blazor stattdessen die kompilierten Bytes booten:",
+            ["Make it yours"] = "Mach ihn zu deinem",
+            ["Every built in button and panel can be left out, and there is room for your own in both places."] =
+                "Jeder eingebaute Button und jedes Panel kann wegbleiben, und für eigene ist an beiden Stellen Platz.",
+            ["are flags. Save, embed, samples and the theme switch show up once somebody answers them — wire the matching event, or register an IPlayzorSnippetStore and save and samples work by themselves."] =
+                "sind Flags. Speichern, Einbetten, Beispiele und der Theme-Schalter erscheinen, sobald jemand darauf antwortet — verdrahte das passende Event, oder registriere einen IPlayzorSnippetStore, dann laufen Speichern und Beispiele von allein.",
+            ["The packages"] = "Die Pakete",
+            ["The playground as a component, with monaco, panels and tool bar."] =
+                "Der Playground als Komponente, mit Monaco, Panels und Toolbar.",
+            ["The compiler underneath, without any ui."] = "Der Compiler darunter, ganz ohne UI.",
+            ["MapPlayzorApi(): the package proxy and optional snippet endpoints."] =
+                "MapPlayzorApi(): der Paket-Proxy und optionale Snippet-Endpunkte.",
+            ["The stub assembly a compiled snippet replaces."] = "Die Stub-Assembly, die ein kompiliertes Snippet ersetzt.",
+            ["The small embed for a foreign page — iframe component and web component."] =
+                "Das kleine Embed für fremde Seiten — iframe-Komponente und Web-Component.",
+            ["Source, issues and the full readme:"] = "Quellcode, Issues und die vollständige Readme:",
+            ["and"] = "und",
 
             // embedding guide
             ["Embed a playground"] = "Einen Playground einbetten",
