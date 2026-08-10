@@ -242,6 +242,8 @@ public class PlayzorLocalizer : IStringLocalizer
             ["This page is one Blazor component. Install the package and your app has the playground — with the panels, the tool bar and the buttons you pick."] =
                 "Diese Seite ist eine Blazor-Komponente. Paket installieren, und deine App hat den Playground — mit den Panels, der Toolbar und den Buttons, die du auswählst.",
             ["Read the editor guide"] = "Zur Editor-Anleitung",
+            ["Source on GitHub"] = "Quellcode auf GitHub",
+            ["The packages on nuget.org"] = "Die Pakete auf nuget.org",
 
             // editor guide
             ["The editor"] = "Der Editor",
