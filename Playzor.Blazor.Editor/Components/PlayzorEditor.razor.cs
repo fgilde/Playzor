@@ -129,6 +129,14 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
     public bool PersistState { get; set; } = true;
 
     /// <summary>
+    /// Loads a stored session right away instead of offering it. Off by default: a playground that
+    /// opens with somebody's half finished experiment instead of its sample is a confusing greeting,
+    /// and the session is one click away as long as it exists.
+    /// </summary>
+    [Parameter]
+    public bool AutoRestoreState { get; set; }
+
+    /// <summary>
     /// Prefix of the local storage keys. Give two editors in one app different prefixes so they do
     /// not share their session.
     /// </summary>
@@ -429,8 +437,10 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
             JsRuntime.InvokeVoid(PlayzorJs.Initialize, _dotNetRef);
         }
 
-        // the first render happens before OnInitializedAsync finished, so auto run waits for content
-        if (AutoRun && !_autoRunDone && CodeFiles.Any())
+        // the first render happens before OnInitializedAsync finished. Waiting for _ready and not
+        // merely for content matters: the installed packages are resolved at the end of it, and a
+        // compile without them fails on every snippet that references one.
+        if (AutoRun && !_autoRunDone && _ready && CodeFiles.Any())
         {
             _autoRunDone = true;
             await Task.Delay(500); // give monaco a moment to hand its content over
@@ -460,6 +470,14 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
 
     #region State
 
+    /// <summary>What was found in local storage: applied right away, or offered.</summary>
+    private sealed record StoredSession(Dictionary<string, CodeFile> Files, List<string> OpenFiles, string Layout);
+
+    private StoredSession _storedSession;
+
+    /// <summary>True while a stored session was found and neither restored nor dismissed.</summary>
+    public bool HasStoredSession => _storedSession != null;
+
     private async Task<bool> LoadStateAsync()
     {
         if (Files != null)
@@ -474,16 +492,28 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
         try
         {
             var stored = await Storage.GetItemAsync<Dictionary<string, CodeFile>>(_keys.Code);
-            if (stored?.Any() == true)
-                CodeFiles = stored;
+            if (stored?.Any() != true)
+                return false;
 
-            var openFiles = await Storage.GetItemAsync<List<string>>(_keys.OpenFiles);
-            if (openFiles != null)
-                _openFiles.AddRange(openFiles.Where(f => f != null && f != CoreConstants.MainComponentFilePath && CodeFiles.ContainsKey(f)).Distinct());
+            var openFiles = (await Storage.GetItemAsync<List<string>>(_keys.OpenFiles) ?? new List<string>())
+                .Where(f => f != null && f != CoreConstants.MainComponentFilePath && stored.ContainsKey(f))
+                .Distinct()
+                .ToList();
 
-            _initialLayoutJson = InitialLayoutJson ?? await Storage.GetItemAsStringAsync(_keys.Layout);
-            if (string.IsNullOrWhiteSpace(_initialLayoutJson) || _initialLayoutJson == "{}")
-                _initialLayoutJson = null;
+            var layout = InitialLayoutJson ?? await Storage.GetItemAsStringAsync(_keys.Layout);
+            if (string.IsNullOrWhiteSpace(layout) || layout == "{}")
+                layout = null;
+
+            if (!AutoRestoreState)
+            {
+                // keep it aside and let the user decide — the default snippet greets them meanwhile
+                _storedSession = new StoredSession(stored, openFiles, layout);
+                return false;
+            }
+
+            CodeFiles = stored;
+            _openFiles.AddRange(openFiles);
+            _initialLayoutJson = layout;
 
             return _initialLayoutJson != null;
         }
@@ -492,6 +522,31 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
             _initialLayoutJson = null;
             return false;
         }
+    }
+
+    /// <summary>Applies the session that was found in storage but not loaded.</summary>
+    public async Task RestoreStoredSessionAsync()
+    {
+        var session = _storedSession;
+        if (session == null) return;
+        _storedSession = null;
+
+        await SetFilesAsync(session.Files.Values);
+        foreach (var path in session.OpenFiles)
+            await OpenFileAsync(path);
+
+        // after the panels exist, otherwise the layout would describe panels that are not there yet
+        if (_dock != null && !string.IsNullOrWhiteSpace(session.Layout))
+            await _dock.RestoreLayoutAsync(session.Layout);
+
+        StateHasChanged();
+    }
+
+    /// <summary>Hides the offer. The session stays until the next save overwrites it.</summary>
+    private void DismissStoredSession()
+    {
+        _storedSession = null;
+        StateHasChanged();
     }
 
     private async ValueTask SaveStateAsync(bool notifyHost = true)
@@ -558,6 +613,7 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
     private async Task CompileAsync()
     {
         CollectAllEditorContent();
+        await EnsureInstalledPackagesAsync();
         await SaveStateAsync();
         Loading = true;
         LoaderText = L["Processing"];
@@ -1008,6 +1064,27 @@ public partial class PlayzorEditor : MudExBaseComponent<PlayzorEditor>
         EnsureReferenceFile().Content = JsonConvert.SerializeObject(_installedPackages, CoreConstants.PackageSerializerSettings);
         await SaveStateAsync(false);
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// A compile with a stale package list fails on every snippet that references one, and the list
+    /// can be stale: a host may trigger the compile right after handing new files over, before the
+    /// component got to process them. Costs nothing while the list already covers the file.
+    /// </summary>
+    private async Task EnsureInstalledPackagesAsync()
+    {
+        try
+        {
+            var wanted = JsonConvert.DeserializeObject<List<NugetPackage>>(EnsureReferenceFile().Content);
+            if (wanted?.Any(w => _installedPackages.All(p => p.Id != w.Id)) != true)
+                return;
+
+            _installedPackages = await GetInstalledAsync();
+        }
+        catch
+        {
+            // a broken reference file is the compiler's problem to report, not ours
+        }
     }
 
     private CodeFile EnsureReferenceFile()

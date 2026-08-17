@@ -243,6 +243,11 @@ public class PlayzorLocalizer : IStringLocalizer
                 "Diese Seite ist eine Blazor-Komponente. Paket installieren, und deine App hat den Playground — mit den Panels, der Toolbar und den Buttons, die du auswählst.",
             ["Read the editor guide"] = "Zur Editor-Anleitung",
             ["Source on GitHub"] = "Quellcode auf GitHub",
+            ["Also building with .NET Aspire?"] = "Baust du auch mit .NET Aspire?",
+            ["A session from your last visit is still in this browser."] =
+                "Aus deinem letzten Besuch liegt noch eine Sitzung in diesem Browser.",
+            ["Restore"] = "Wiederherstellen",
+            ["Dismiss"] = "Verwerfen",
             ["The packages on nuget.org"] = "Die Pakete auf nuget.org",
 
             // editor guide

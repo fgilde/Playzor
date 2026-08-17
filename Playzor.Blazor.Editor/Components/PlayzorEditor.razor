@@ -117,6 +117,17 @@
         @HeaderContent
     </div>
 
+    @if (HasStoredSession)
+    {
+        <MudAlert Severity="Severity.Info" Dense="true" Class="playzor-session-offer" Icon="@Icons.Material.Outlined.History">
+            <div class="d-flex align-center flex-wrap" style="gap:10px;">
+                <span>@L["A session from your last visit is still in this browser."]</span>
+                <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" OnClick="@RestoreStoredSessionAsync">@L["Restore"]</MudButton>
+                <MudButton Size="Size.Small" Variant="Variant.Text" OnClick="@DismissStoredSession">@L["Dismiss"]</MudButton>
+            </div>
+        </MudAlert>
+    }
+
     <div class="playzor-editor-body">
         <MudOverlay Visible="Loading" Absolute="true" DarkBackground="true">
             <MudText Typo="Typo.h4" Class="white-text">@LoaderText</MudText>
