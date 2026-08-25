@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://fgilde.github.io/QuickRun/quickrun.schema.json
+name: Playzor
+description: "A Blazor component library with no host project in the repository, so this builds it and runs the tests."
+
+requires:
+  - tool: dotnet
+    version: ">=10.0"
+    install: https://dotnet.microsoft.com/download
+
+setup:
+  - run: dotnet restore Playzor.slnx
+  - run: dotnet build Playzor.slnx -c Release
+
+tasks:
+  - name: test
+    run: dotnet test Playzor.slnx -c Release --no-build
