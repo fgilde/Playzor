@@ -1,4 +1,5 @@
 [![Playzor](https://raw.githubusercontent.com/fgilde/MudBlazor.Extensions/refs/heads/main/docs/playzor_logo.png)](https://playzor.net)
+[![QuickRun](https://quickrun.org/badge.svg)](https://quickrun.org/run?repo=fgilde/Playzor)
 
 # Playzor
 
