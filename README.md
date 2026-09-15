@@ -47,4 +47,4 @@ All five packages share one version.
 
 ## License
 
-MIT.
+MIT — see [LICENSE](LICENSE).
