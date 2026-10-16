@@ -7,13 +7,13 @@
   <ItemGroup>
     <!-- the compiler hands these to the user code as ambient references, so a snippet can render
          mud components without installing anything -->
-    <PackageVersion Include="MudBlazor.Extensions" Version="9.10.0" />
+    <PackageVersion Include="MudBlazor.Extensions" Version="9.11.4" />
 
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.36" />
-    <PackageVersion Include="System.Net.Http.Json" Version="10.0.12" />
+    <PackageVersion Include="System.Net.Http.Json" Version="10.0.13" />
     <PackageVersion Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
