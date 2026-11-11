@@ -50,3 +50,6 @@ TryMudEx/MudBlazor.Extensions/
 # build output (global — new projects must not check these in)
 bin/
 obj/
+
+.libmentor/
+.libmentor-inputs/
